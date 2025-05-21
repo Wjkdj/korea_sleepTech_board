@@ -1,0 +1,30 @@
+//# Axios 인스턴스 및 공통 설정
+
+import axios, { AxiosError, AxiosResponse } from "axios";
+import { ResponseDto } from "../dtos/response";
+
+// Axios 인스턴스 생성
+export const axiosInstance = axios.create({
+  // process.env.REACT_APP~
+  // : 리액트 프로젝트에서 환경 변수를 사용하는 방식
+  // > 프로젝트 루트에 .env 파일을 생성하여 데이터 저장
+  baseURL: import.meta.env.REACT_APP_API_DOMAIN || "http://localhost:8080"
+});
+
+// 공통 응답 처리 (응답 핸들러)
+// 1) 성공
+export const responseSuccessHandler = <T = any>(response: AxiosResponse<ResponseDto<T>>) => {
+  return response.data;
+};
+
+// 2) 실패
+export const responseErrorHandler = (error: AxiosError<ResponseDto>) => {
+  if (!error.response) return { result: false, message: "네트워크 오류" };
+  return error.response.data;
+};
+
+//& function: Authrization Bearer 헤더 //
+// >> 인증이 필요한 모든 요청에 JWT access token을 붙이기 위해 사용
+const bearerAUthrization = (accessToken: string) => ({
+  headers: { Authrization: `Bearer ${accessToken}` },
+}); // 객체 단읿 반환 불가: 소괗로로 감싸서 전달
